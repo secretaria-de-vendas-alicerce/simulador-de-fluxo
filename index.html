@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Alicerce — Simulador de Fluxo</title>
+  <meta name="description" content="Simulador de composição de entrada — Alicerce Consultoria.">
+  <!--
+    WRAPPER ANTI /u/N/ — por que este arquivo existe
+    -------------------------------------------------
+    O web app do Apps Script e servido em script.google.com/macros/s/.../exec.
+    Com 2+ contas Google logadas, o Google redireciona a /exec para /u/1/, /u/2/...
+    chuta o indice errado e mostra "Nao foi possivel abrir o arquivo". Carregando a
+    MESMA /exec dentro de um <iframe> a partir de um dominio que NAO e google.com, o
+    app abre igual em qualquer navegador. Ver o wrapper do Gerenciador de Escrituras.
+
+    Pre-requisitos (ja feitos no app):
+      - Implantacao: "Executar como: Eu" + "Quem pode acessar: Qualquer pessoa".
+      - doGet(): setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL).
+
+    IMPORTANTE (Simulador): o iframe precisa de `allow="clipboard-write"` para o
+    botao COPIAR (navigator.clipboard) funcionar dentro do wrapper.
+  -->
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { margin: 0; height: 100%; background: #fafafa; }
+    #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+    #fallback {
+      position: fixed; inset: 0; display: none;
+      align-items: center; justify-content: center; padding: 24px;
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #27272a; text-align: center;
+    }
+    #fallback a { color: #2563eb; }
+    .loading {
+      position: fixed; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      font: 14px system-ui, sans-serif; color: #71717a; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">Carregando o simulador…</div>
+
+  <!--
+    credentialless: carrega o iframe num contexto efemero, SEM os cookies de
+    sessao do Google (igual a uma aba anonima) — e o que contorna o roteador de
+    conta /u/N/. Chromium (Chrome/Edge 110+). Firefox/Safari ignoram (fallback: link).
+  -->
+  <iframe
+    id="app"
+    credentialless
+    src="https://script.google.com/macros/s/AKfycbyAE30P0nfW1tryx1II_jerZbRF96HkireRxaqCQAQRfC_xMMvimcMn_55I4Zg0Ho3PhA/exec"
+    title="Alicerce — Simulador de Fluxo"
+    allow="clipboard-write; clipboard-read; fullscreen"
+    referrerpolicy="no-referrer"
+    onload="document.getElementById('loading').style.display='none'"></iframe>
+
+  <div id="fallback">
+    <div>
+      <p><strong>Nao foi possivel carregar.</strong></p>
+      <p>Abra o link diretamente:
+        <a id="directLink" href="https://script.google.com/macros/s/AKfycbyAE30P0nfW1tryx1II_jerZbRF96HkireRxaqCQAQRfC_xMMvimcMn_55I4Zg0Ho3PhA/exec" target="_blank" rel="noopener">abrir o simulador</a>.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Se o iframe nao sinalizar load em ~12s, oferece o link direto.
+    setTimeout(function () {
+      var ld = document.getElementById('loading');
+      if (ld && ld.style.display !== 'none') {
+        ld.style.display = 'none';
+        document.getElementById('fallback').style.display = 'flex';
+      }
+    }, 12000);
+  </script>
+</body>
+</html>
